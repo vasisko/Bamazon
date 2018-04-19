@@ -55,7 +55,7 @@ function promptUser(){
     
     console.log("To order, please select the item you wish to purchase from the listing above");
         
-    inquirer.prompt ([  
+    inquirer.prompt ([
 
             //ID of the product they would like to buy
             { name: "itemId",
