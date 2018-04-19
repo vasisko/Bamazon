@@ -1,6 +1,7 @@
 BAMAZON
+=======
 
-The Bamazon command line storefront app allows the user to order from a list of products, specifying item and quantity.  Orders are confirmed with order total, and the mysql database of products is updated to reflect the reduction in the items quantity.
+The Bamazon command line storefront app allows the user to order from a list of products, specifying item and quantity.  Orders are confirmed with order total, and the mysql database of products is updated to reflect the reduction in the item's in-stock quantity.
 
 Getting Started
 ---------------
@@ -26,16 +27,16 @@ item id, product name, price, and quantity in stock
 
 Store
 -----
-The command line store can be run by calling bamazonCustomer.js.  The user will be shown a list of products available for ordering.  The user is prompted to enter the Item Id for the item they would like to order, and then prompted for the quantity desired.  
+The command line store can be run by calling bamazonCustomer.js.  The user will be shown a list of products available for ordering.  The user is prompted to enter the Item Id for the item they would like to order, and prompted again for the quantity desired.  
 
-Once a order has been placed, the stock is verified, and if fully available, the order is processed by displaying a message to the user with the order total, and the database is updated to reflect the change in stock.
+Once an order has been placed, the stock available for the item is verified, and if fully available, the order is processed:  A confirmation order message is displayed for the user with the order total, and the database is updated to reflect the change in stock.
 
 Built With
 ----------
 * MySQL Workbench- to create the product database
 * Node.js - to create the command line store 
 * mysql NPM - for database integration 
-inquirer NPM - for prompting user
+* inquirer NPM - for prompting user
 
 Author
 ------
