@@ -1,114 +1,138 @@
 // Install npm's inquirer and mysql before running
 
 //Require npm's 
-var inquirer = require('inquirer');
-var mysql = require('mysql');
+var mysql = require("mysql");
+var inquirer = require("inquirer");
 
-var productCount = 0; // # of products available to order
+//variables
+var productCount = 0;
+var orderItem;
+var orderQty;
 
-//Set-up connection to mysql
+//Set-up parameters for MySQL
 var connection = mysql.createConnection({
-    host:"localhost",
+    host: "localhost",
     port: 3306,
     user: "root",
-    password:"Mysqlr00t",
+    password: "Mysqlr00t",
     database: "bamazon_db"
 });
 
-//Connect to mysql
-connection.connect(function(err){
-    if(err) throw err;
-    //connection made 
-    console.log(`connected as id ${connection.threadId}`);
+//Establish connection with MySQL   
+connection.connect(function(err) {
+    if (err) throw err;
+    console.log("connected as id " + connection.threadId + "\n");
     listProducts();
-    
 });
 
-function readProducts() {
-    console.log("Selecting all products...\n");
-    connection.query("SELECT * FROM products", function(err, res) {
-      //if (err) throw err;
-      // Log all results of the SELECT statement
-      console.log(res);
-    });
-  }
-  
+// FUNCTION listProducts(): will list out items for ordering, will get # of items (for validation of item #) and will call userPrompt()
+function listProducts() {
+    //print heading
+    console.log("Our Products: \n");
+    //query all items from db
+    var query = "SELECT * FROM products";
+    connection.query(query, function(err, res) {
+      if (err) throw err;
+      // Log results of the SELECT statement
+      for (var i = 0; i < res.length; i++) {
+        console.log(`Item ID = ${res[i].item_id}... ${res[i].product_name} ${res[i].price}`);
+      } 
 
+      //Call function to prompt user
+      promptUser();
+    });//end query
+}
 
-// function listProducts() display all products(query db)  
-function listProducts(){
-   
-    connection.query("SELECT item_id product_name price FROM products", function(err, res){
-        console.log("here!!");
-        
-       // if (err) throw err;
-        for (var i = 0; i < res.length; i++) {
-            console.log(`ID #:  ${res[i].item_id}  Item: ${res[i].product_name}  price: ${res[i].price}`);
-        } 
-        productCount = res.length;
-    });
- //   promptUser();
-};
-
-// function promptUser() to prompt user for action (using inquirer npm)
+//FUNCTION promptUser():  prompts user for item and amt, calls processOrder()
 function promptUser(){
-    
-    console.log("To order, please select the item you wish to purchase from the listing above");
-        
-    inquirer.prompt ([
-
-            //ID of the product they would like to buy
-            { name: "itemId",
-              type: "input",
-              message: "Enter the item ID number: ",
-              validate: function(value) {
-                if (isNaN(value) === false) {
-                  return true;
-                }
-                return false;
-              } 
-            },
-
-            //QUANTITY of the product they would like to buy
-            { name: "itemQty",
-              type: "input",
-              message: "Enter the item QUANTITY: ",
-              validate: function(value) {
-                if (isNaN(value) === false) {
-                  return true;
-                }
-                return false;
-              }
+    inquirer.prompt([
+        { //Prompt user: ITEM
+          name: "item",
+          type: "input",
+          message: "TO ORDER: please enter the item ID number: ",
+          validate: function(value) {
+            if (isNaN(value) === false) {
+              return true;
             }
-        ])
-        . then(function(order) {
-            // is product id value valid?
-                if(order.itemId<productCount){
-                     //yes... continue with order
-                    console.log("place order");
-                    //processOrder();
-                }
-                // no - invalid, alert user, try again
-                console.log("Invalid product id.  Please try again.");
-                listProducts();
-            });
+            return false;
+          } 
+        },
+        { //Prompt user: QTY
+          name: "qty",
+          type: "input",
+          message: "How many would you like to order: ",
+          validate: function(value) {
+            if (isNaN(value) === false) {
+              return true;
+            }
+           
+            return false;
+          }   
+        }
+    ]).then(function(answer) {
+        //get User input
         
-    };
+        //convert string inputs to numbers
+          orderItem = parseInt(answer.item);
+          orderQty = parseInt(answer.qty);
+        
+        
+        //Is ID valid ? REDO:  read db -- if item matches an item_id , then item is valid
+        //if(answer.item < productCount){   
+            //yes... continue with order
+        //console.log("id validates");
+        processOrder();
+       //}
+       //else {
+            // no - invalid, alert user, try again
+         //   console.log("Invalid product id.  Please try again.");
+         //   promptUser();
+       //}
+    });//end prompt
+}
 
-// function processOrder() to process user input = order
-//   function processOrder(order){
- //       var query = connection.query(
- //           "SELECT stock_quantity FROM bamazon_db WHERE ?" [{item_id: order.itemID}]*****************************
- //       )
+function processOrder(){
 
-   // }
-//check if store has enough of the product to meet the customer's request
-// no:  err msg:  "Insufficient Quantity"  call to promptUser() 
-// yes: fullfill order
-    // update qty in db, show user total cost
+//Is QTY valid ?
+    var query = "SELECT item_id, product_name, price, stock_quantity FROM products";
+    connection.query(query, function(err, res) {
+        if (err) throw err;
+        
+       //console.log(res.length);
+       //console.log("Order Item" + orderItem);
+       var chosenItem;
+       for (var i = 0; i < res.length; i++) {
+         if (res[i].item_id === orderItem) {
+           chosenItem = res[i];
+         }
+       }
+       
+       var qtyInStock = chosenItem.stock_quantity;
+        //console.log("# in stock:" + qtyInStock);
 
-
-// order complete...disconnect db
-connection.end();
-
+        if(!(orderQty > qtyInStock)){
+           //console.log("We have that product in stock");
+           
+            connection.query("UPDATE products SET ? WHERE ?", 
+            [
+                {   
+                    stock_quantity: chosenItem.stock_quantity - orderQty
+                },
+                {
+                item_id: chosenItem.item_id
+                }
+            ], function(error) {
+                if (error) throw err;
+                console.log("Order placed successfully! Your total is $" + orderQty*chosenItem.price);
+                //console.log("Thank you for your order!");
+                promptUser();
+              }
+            )
+        } 
+        else { 
+          console.log(`Can not place order: Only ${qtyInStock} left.`);
+          promptUser();
+      }
+});
+}
 
