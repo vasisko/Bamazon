@@ -25,7 +25,7 @@ connection.connect(function(err) {
     listProducts();
 });
 
-// FUNCTION listProducts(): will list out items for ordering, will get # of items (for validation of item #) and will call userPrompt()
+// Function listProducts(): will list out items for ordering, will get # of items (for validation of item #) and will call userPrompt()
 function listProducts() {
     //print heading
     console.log("Our Products: \n");
@@ -43,10 +43,10 @@ function listProducts() {
     });//end query
 }
 
-//FUNCTION promptUser():  prompts user for item and amt, calls processOrder()
+//Function promptUser():  prompts user for item and amt, calls processOrder()
 function promptUser(){
     inquirer.prompt([
-        { //Prompt user: ITEM
+        { 
           name: "item",
           type: "input",
           message: "TO ORDER: please enter the item ID number: ",
@@ -57,7 +57,7 @@ function promptUser(){
             return false;
           } 
         },
-        { //Prompt user: QTY
+        { 
           name: "qty",
           type: "input",
           message: "How many would you like to order: ",
@@ -73,24 +73,14 @@ function promptUser(){
         //get User input
         
         //convert string inputs to numbers
-          orderItem = parseInt(answer.item);
-          orderQty = parseInt(answer.qty);
+        orderItem = parseInt(answer.item);
+        orderQty = parseInt(answer.qty);
         
-        
-        //Is ID valid ? REDO:  read db -- if item matches an item_id , then item is valid
-        //if(answer.item < productCount){   
-            //yes... continue with order
-        //console.log("id validates");
         processOrder();
-       //}
-       //else {
-            // no - invalid, alert user, try again
-         //   console.log("Invalid product id.  Please try again.");
-         //   promptUser();
-       //}
-    });//end prompt
+       
+    });
 }
-
+// Function processOrder:  check quantities, calculate order total, update database 
 function processOrder(){
 
 //Is QTY valid ?

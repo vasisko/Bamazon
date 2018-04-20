@@ -23,7 +23,11 @@ Place all files listed above within the same folder.
 Database
 --------
 The product database, bamazon_db, contains the following fields:
-item id, product name, price, and quantity in stock
+* item_id (unique id for each product)
+* product_name (Name of product)
+* department_name
+* price (cost to customer)
+* stock_quantity (how much of the product is available in stores)
 
 Store
 -----
