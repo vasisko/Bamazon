@@ -10,7 +10,7 @@ var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
     user: "root",
-    password: "Mysqlr00t",
+    password: "",
     database: "bamazon_db"
 });
 
@@ -118,7 +118,7 @@ function addInventory(){
               type: "input",
               message: "Enter the item ID number of the product you wish to update: ",
               validate: function(value) {
-                if (isNaN(value) === false) {
+                if (isNaN(value) === false) { 
                   return true;
                 }
                 return false;
@@ -132,10 +132,9 @@ function addInventory(){
                 if (isNaN(value) === false) {
                   return true;
                 }
-               
                 return false;
-              }   
-            }
+              } 
+            }  
         ]).then(function(answer) {
             //get User input
             //convert string inputs to numbers
@@ -239,12 +238,15 @@ inquirer.prompt([
           department_name: answer.department,
           price: parseFloat(answer.price),
           stock_quantity: parseInt(answer.qty)
-        }),
-      function(err, res) {
-        if (err) throw err;
-        console.log(`Product added: \n ${answer.iid}...${answer.item}...${answer.department} $${    answer.price}...qty: ${answer.qty}`); 
-      }
-        promptMgr();
-         
+        }, 
+        function(err, res) {
+          if (err) throw err;
+          // Send user confirmation screen
+          console.log(`Product added: \n ${answer.id}...${answer.item}...${answer.department} $${    answer.price}...qty: ${answer.qty}`); 
+      
+    
+        promptMgr();  
     });
-}        
+  
+});
+}

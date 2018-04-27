@@ -14,7 +14,7 @@ var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
     user: "root",
-    password: "Mysqlr00t",
+    password: "",
     database: "bamazon_db"
 });
 
@@ -55,8 +55,8 @@ function promptUser(){
               return true;
             }
             return false;
-          } 
-        },
+        }
+      },
         { 
           name: "qty",
           type: "input",
